@@ -16,7 +16,7 @@ meta =
         {id = "ShrooblordMothership", min = "1.1.0"},              --ShrooblordMothership (library mod)
     },
 
-    serverSideOnly = true,
+    serverSideOnly = false,
     clientSideOnly = false,
     saveGameAltering = true,
 
