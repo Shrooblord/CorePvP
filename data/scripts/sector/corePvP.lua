@@ -1,4 +1,4 @@
---Core PvP (C) 2019 Shrooblord
+--Core PvP (C) 2019-2020 Shrooblord
 --Main functionality of the Core PvP mod. Takes the distances set in config and applies them globally across the Galaxy as a setting to enable / disable PvP in that Sector.
 
 package.path = package.path .. ";data/scripts/lib/?.lua"
@@ -18,7 +18,7 @@ local fromScript = "sector/corePvP"
 local delayedInitPerformed = false
 
 local forcePVPState
-local distToCentre = -1
+local distToCentre = 9999
 
 --config.PvPZoneDist
 --config.PvPZoneDisableNeutralZone
@@ -29,7 +29,7 @@ function CorePvP.initialize()
     local fromFunc = "initialize"
 
     local sector = Sector()
-    x, y = sector:getCoordinates()
+    local x, y = sector:getCoordinates()
     prtDbg("Initialising Core PvP...", 0, config.modID, 1, fromScript, fromFunc, "SERVER")
 
     distToCentre = math.floor(length(vec2(x, y)))
@@ -44,14 +44,11 @@ function CorePvP.initialize()
     prtDbg("Core PvP Initialised!", 0, config.modID, 1, fromScript, fromFunc, "SERVER")
 end
 
-
 function CorePvP.performDelayedInit()
     local fromFunc = "performDelayedInit"
 
     prtDbg("Performing Core PvP delayed Initiation...", 0, config.modID, 1, fromScript, fromFunc, "SERVER")
 
-    local faction, isOnline
-    local server = Server()
     local sector = Sector()
 
     if (distToCentre <= config.PvPZoneDist and forcePVPState == nil) or forcePVPState then -- PvP enabled
@@ -100,9 +97,10 @@ function CorePvP.performDelayedInit()
     prtDbg("Core PvP delayed Initiation completed!", 0, config.modID, 1, fromScript, fromFunc, "SERVER")
 end
 
-
 function CorePvP.onRestoredFromDisk(time)
     if not delayedInitPerformed then
+        local fromFunc = "onRestoredFromDisk"
+        prtDbg("restored", 0, config.modID, 4, fromScript, fromFunc, "SERVER")
         delayedInitPerformed = true
         CorePvP.performDelayedInit()
     end
@@ -110,6 +108,8 @@ end
 
 function CorePvP.onPlayerEntered(playerIndex)
     if not delayedInitPerformed then
+        local fromFunc = "onPlayerEntered"
+        prtDbg("player entered", 0, config.modID, 4, fromScript, fromFunc, "SERVER")
         delayedInitPerformed = true
         CorePvP.performDelayedInit()
     end
@@ -120,6 +120,8 @@ end
 
 function CorePvP.onPlayerLeft(playerIndex)
     if not delayedInitPerformed then
+        local fromFunc = "onPlayerLeft"
+        prtDbg("player left", 0, config.modID, 4, fromScript, fromFunc, "SERVER")
         delayedInitPerformed = true
         CorePvP.performDelayedInit()
     end

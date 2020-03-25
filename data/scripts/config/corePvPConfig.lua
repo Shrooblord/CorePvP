@@ -1,4 +1,4 @@
---Behaviour Chips (C) 2019 Shrooblord
+--Core PvP (C) 2019-2020 Shrooblord
 --Configuration file for the Core PvP mod.
 
 package.path = package.path .. ";data/scripts/config/?.lua"
