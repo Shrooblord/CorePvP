@@ -52,7 +52,11 @@ function CorePvP.performDelayedInit()
     local sector = Sector()
 
     if forcePVPState or distToCentre <= config.PvPZoneDist then -- PvP enabled
-        sector.pvpDamage = 1
+        sector.pvpDamage = true
+
+        print("Sector PvP [0]: " .. tostring(sector.pvpDamage))
+
+        local message = ""
 
         -- Toggle Neutral Zone
         if config.PvPZoneDisableNeutralZone then
@@ -64,24 +68,31 @@ function CorePvP.performDelayedInit()
                 prtDbg("Removed neutralzone.lua", 0, config.modID, 4, fromScript, fromFunc, "SERVER")
             end
         elseif sector:getValue("corePvP_was_neutral_zone") then
-            sector.pvpDamage = 0
+            sector.pvpDamage = false
             -- Restore neutralzone
             sector:addScriptOnce("data/scripts/sector/neutralzone.lua")
             sector:setValue("corePvP_was_neutral_zone")
             sector:setValue("neutral_zone", 1)
             prtDbg("Restored neutralzone.lua", 0, config.modID, 4, fromScript, fromFunc, "SERVER")
+
+            message = " (Neutral Zone)"
         end
 
-        if sector.pvpDamage then
-            local message = "Sector initialised as PvP zone. Distance to centre: " .. distToCentre
+        print("Sector PvP [1]: " .. tostring(sector.pvpDamage))
+
+        if sector.pvpDamage == 1 then
+            message = "Sector initialised as PvP zone. Distance to centre: " .. distToCentre
             if forcePVPState then
                 message = message .. "; FORCE ENABLED BY USER"
             end
 
             prtDbg(message, 0, config.modID, 2, fromScript, fromFunc, "SERVER")
         else
-            prtDbg("Sector initialised as PvE (Neutral Zone). Distance to centre: " .. distToCentre, 0, config.modID, 3, fromScript, fromFunc, "SERVER")
+            message = "Sector initialised as PvE" .. message
+            prtDbg(message .. ". Distance to centre: " .. distToCentre, 0, config.modID, 3, fromScript, fromFunc, "SERVER")
         end
+
+        print("Sector PvP [2]: " .. tostring(sector.pvpDamage))
     else -- PvE (PvP disabled)
         local message = "Sector initialised as PvE"
 
@@ -94,8 +105,10 @@ function CorePvP.performDelayedInit()
             
             message = message .. " (Neutral Zone)"
         end
-        sector.pvpDamage = 0
+        sector.pvpDamage = false
         prtDbg(message .. ". Distance to centre: " .. distToCentre, 0, config.modID, 3, fromScript, fromFunc, "SERVER")
+        
+        print("Sector PvP [3]: " .. tostring(sector.pvpDamage))
     end
 
     prtDbg("Core PvP delayed Initiation completed!", 0, config.modID, 2, fromScript, fromFunc, "SERVER")

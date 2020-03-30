@@ -24,7 +24,9 @@ function initCorePvP()
 
     prtDbg("PvP Core at [" .. tostring(config.PvPZoneDist) .. "]; distance to PvP Core: " .. tostring(distToCentre), 0, config.modID, 4, fromScript, fromFunc, "SERVER")
 
-    if (distToCentre <= config.PvPZoneDist and forcePVPState == nil) or forcePVPState then
+    local shroobDebug = true
+    
+    if shroobDebug or forcePVPState or distToCentre <= config.PvPZoneDist then
         prtDbg("Sector is eligible!", 0, config.modID, 2, fromScript, fromFunc, "SERVER")
         Sector():addScriptOnce("sector/corePvP.lua")
     else
