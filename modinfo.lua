@@ -1,7 +1,7 @@
 
 meta =
 {
-    id = "1923214209", --ws id "1923214209"
+    id = "CorePvP", --ws id "1923214209"
     name = "CorePvP",
     title = "Core PvP",
     description = "Designate a section of the Galaxy as PvP zone; in the rest of the Galaxy, PvP is disabled.",
