@@ -60,27 +60,31 @@ function CorePvP.performDelayedInit()
 
         -- Toggle Neutral Zone
         if config.PvPZoneDisableNeutralZone then
-            if sector:hasScript("neutralzone.lua") then
+            if sector:hasScript("data/scripts/sector/neutralzone.lua") then
                 -- Remove 'neutralzone' script
                 sector:setValue("corePvP_was_neutral_zone", 1)
                 sector:setValue("neutral_zone")
                 sector:removeScript("data/scripts/sector/neutralzone.lua")
                 prtDbg("Removed neutralzone.lua", 0, config.modID, 4, fromScript, fromFunc, "SERVER")
             end
-        elseif sector:getValue("corePvP_was_neutral_zone") then
-            sector.pvpDamage = false
-            -- Restore neutralzone
-            sector:addScriptOnce("data/scripts/sector/neutralzone.lua")
-            sector:setValue("corePvP_was_neutral_zone")
-            sector:setValue("neutral_zone", 1)
-            prtDbg("Restored neutralzone.lua", 0, config.modID, 4, fromScript, fromFunc, "SERVER")
+        else
+            if sector:getValue("corePvP_was_neutral_zone") then
+                -- Restore neutralzone
+                sector:addScriptOnce("data/scripts/sector/neutralzone.lua")
+                sector:setValue("corePvP_was_neutral_zone")
+                sector:setValue("neutral_zone", 1)
+                prtDbg("Restored neutralzone.lua", 0, config.modID, 4, fromScript, fromFunc, "SERVER")
+            end
 
-            message = " (Neutral Zone)"
+            if sector:hasScript("data/scripts/sector/neutralzone.lua") then
+                sector.pvpDamage = false
+                message = " (Neutral Zone)"
+            end
         end
 
         print("Sector PvP [1]: " .. tostring(sector.pvpDamage))
 
-        if sector.pvpDamage == 1 then
+        if sector.pvpDamage then
             message = "Sector initialised as PvP zone. Distance to centre: " .. distToCentre
             if forcePVPState then
                 message = message .. "; FORCE ENABLED BY USER"
@@ -107,11 +111,12 @@ function CorePvP.performDelayedInit()
         end
         sector.pvpDamage = false
         prtDbg(message .. ". Distance to centre: " .. distToCentre, 0, config.modID, 3, fromScript, fromFunc, "SERVER")
-        
+
         print("Sector PvP [3]: " .. tostring(sector.pvpDamage))
     end
 
     prtDbg("Core PvP delayed Initiation completed!", 0, config.modID, 2, fromScript, fromFunc, "SERVER")
+    terminate() --kill and remove the script (closing the lua VM)
 end
 
 function CorePvP.onRestoredFromDisk(time)
