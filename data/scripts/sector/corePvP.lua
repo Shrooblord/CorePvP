@@ -30,7 +30,7 @@ function CorePvP.initialize()
 
     local sector = Sector()
     local x, y = sector:getCoordinates()
-    prtDbg("Initialising Core PvP...", 0, config.modID, 1, fromScript, fromFunc, "SERVER")
+    prtDbg("Initialising Core PvP...", 0, config.modID, 2, fromScript, fromFunc, "SERVER")
 
     distToCentre = math.floor(length(vec2(x, y)))
 
@@ -47,29 +47,29 @@ end
 function CorePvP.performDelayedInit()
     local fromFunc = "performDelayedInit"
 
-    prtDbg("Performing Core PvP delayed Initiation...", 0, config.modID, 1, fromScript, fromFunc, "SERVER")
+    prtDbg("Performing Core PvP delayed Initiation...", 0, config.modID, 2, fromScript, fromFunc, "SERVER")
 
     local sector = Sector()
 
-    if (distToCentre <= config.PvPZoneDist and forcePVPState == nil) or forcePVPState then -- PvP enabled
+    if forcePVPState or distToCentre <= config.PvPZoneDist then -- PvP enabled
         sector.pvpDamage = 1
 
-        -- Toggle PVP/PVE
+        -- Toggle Neutral Zone
         if config.PvPZoneDisableNeutralZone then
             if sector:hasScript("neutralzone.lua") then
                 -- Remove 'neutralzone' script
                 sector:setValue("corePvP_was_neutral_zone", 1)
                 sector:setValue("neutral_zone")
                 sector:removeScript("data/scripts/sector/neutralzone.lua")
-                prtDbg("Removed neutralzone.lua", 0, config.modID, 3, fromScript, fromFunc, "SERVER")
+                prtDbg("Removed neutralzone.lua", 0, config.modID, 4, fromScript, fromFunc, "SERVER")
             end
-        elseif sector:getValue("was_neutral_zone") then
+        elseif sector:getValue("corePvP_was_neutral_zone") then
             sector.pvpDamage = 0
             -- Restore neutralzone
             sector:addScriptOnce("data/scripts/sector/neutralzone.lua")
             sector:setValue("corePvP_was_neutral_zone")
             sector:setValue("neutral_zone", 1)
-            prtDbg("Restored neutralzone.lua", 0, config.modID, 3, fromScript, fromFunc, "SERVER")
+            prtDbg("Restored neutralzone.lua", 0, config.modID, 4, fromScript, fromFunc, "SERVER")
         end
 
         if sector.pvpDamage then
@@ -80,21 +80,25 @@ function CorePvP.performDelayedInit()
 
             prtDbg(message, 0, config.modID, 2, fromScript, fromFunc, "SERVER")
         else
-            prtDbg("Sector initialised as PvE (Neutral Zone). Distance to centre: " .. distToCentre, 0, config.modID, 2, fromScript, fromFunc, "SERVER")
+            prtDbg("Sector initialised as PvE (Neutral Zone). Distance to centre: " .. distToCentre, 0, config.modID, 3, fromScript, fromFunc, "SERVER")
         end
     else -- PvE (PvP disabled)
-        if sector:getValue("was_neutral_zone") then
+        local message = "Sector initialised as PvE"
+
+        if sector:getValue("corePvP_was_neutral_zone") then
             -- Restore neutralzone
             sector:addScriptOnce("data/scripts/sector/neutralzone.lua")
             sector:setValue("corePvP_was_neutral_zone")
             sector:setValue("neutral_zone", 1)
-            prtDbg("Restored neutralzone.lua", 0, config.modID, 3, fromScript, fromFunc, "SERVER")
+            prtDbg("Restored neutralzone.lua", 0, config.modID, 4, fromScript, fromFunc, "SERVER")
+            
+            message = message .. " (Neutral Zone)"
         end
         sector.pvpDamage = 0
-        prtDbg("Sector initialised as PvE (Neutral Zone). Distance to centre: " .. distToCentre, 0, config.modID, 2, fromScript, fromFunc, "SERVER")
+        prtDbg(message .. ". Distance to centre: " .. distToCentre, 0, config.modID, 3, fromScript, fromFunc, "SERVER")
     end
 
-    prtDbg("Core PvP delayed Initiation completed!", 0, config.modID, 1, fromScript, fromFunc, "SERVER")
+    prtDbg("Core PvP delayed Initiation completed!", 0, config.modID, 2, fromScript, fromFunc, "SERVER")
 end
 
 function CorePvP.onRestoredFromDisk(time)
